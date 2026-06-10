@@ -175,8 +175,6 @@ select.pais-filter{padding:5px 10px;border:1px solid var(--bd);border-radius:5px
   <div class="tab" onclick="ST('comp',this)" id="tab-comp-btn">📈 Comparativo Q4 2025 vs Q1 2026</div>
   <div class="tab" onclick="ST('can',this)">🚫 Cancelados</div>
   <div class="tab" onclick="ST('ctrl',this)">🗼 Torre de Control</div>
-  <div class="tab" onclick="ST('rec',this)" id="tab-rec-btn">💡 Recomendaciones Q2 2026</div>
-  <div class="tab" onclick="ST('rdm',this)" id="tab-rdm-btn">🗺️ Roadmap 2026</div>
   <div class="tab" onclick="ST('tiem',this)" id="tab-tiem-btn">⏱️ Tiempo Empleado</div>
 </div>
 
@@ -298,9 +296,8 @@ select.pais-filter{padding:5px 10px;border:1px solid var(--bd);border-radius:5px
     <div class="kc gy"><div class="kl">Total Q1 2026</div><div class="kv" style="color:var(--gy)">818</div><div class="ks">universo completo</div>
       <div class="kd dp">Q4 2025: 819</div></div></div>
 
-  <div class="g2" style="margin-bottom:12px">
-    <div class="gc"><div class="ct" id="cTipoQ-title">Recurrentes vs SR — Comparativo Q</div><div class="cs">Volumen por tipo comparado entre quarters</div><canvas id="cTipoQ" height="560" style="box-sizing: border-box; display: block; height: 373px; width: 589px;" width="884"></canvas></div>
-    <div class="gc">
+  <div style="margin-bottom:12px">
+    <div class="gc" style="width:100%;max-width:100%">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div><div class="ct">Volumen Semanal — Creación vs Resolución</div><div class="cs">Por período bisemanal en el Q · Filtrar por país</div></div>
         <select class="pais-filter" id="weeklyFilter" onchange="renderWeeklyChart()">
@@ -312,76 +309,31 @@ select.pais-filter{padding:5px 10px;border:1px solid var(--bd);border-radius:5px
           <option value="Todos">Cross-país (ALL)</option>
         </select>
       </div>
-      <canvas id="cWeekly" height="560" style="box-sizing: border-box; display: block; height: 373px; width: 589px;" width="884"></canvas>
+      <canvas id="cWeekly"></canvas>
     </div>
   </div>
 
-  <div class="sl">CLASIFICACIONES (excl. Soporte incidencias)</div>
-  <div class="g3" style="margin-bottom:12px">
-    <div class="gc"><div class="ct">Volumen por Clasificación</div><div class="cs">Excluye Soporte a incidencias para mejor legibilidad</div><canvas id="cClasHBar" height="419" style="box-sizing: border-box; display: block; height: 279px; width: 381px;" width="572"></canvas></div>
-    <div class="gc"><div class="ct">% Resolución por Clasificación</div><div class="cs">Resueltos y En Curso por tipo de trabajo</div><canvas id="cClasRes" height="419" style="box-sizing: border-box; display: block; height: 279px; width: 381px;" width="572"></canvas></div>
-    <div class="gc"><div class="ct">Por Mercado (excl. Soporte)</div><div class="cs">Distribución por país — clasificaciones secundarias</div><canvas id="cClasMkt" height="419" style="box-sizing: border-box; display: block; height: 279px; width: 381px;" width="572"></canvas></div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
+    <div style="font-size:11px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;">Clasificaciones (excl. Soporte)</div>
+    <select class="pais-filter" id="clasFilterPais" onchange="renderClasChart()" style="min-width:130px;">
+      <option value="ALL">Todos los países</option>
+      <option value="Caribe">Caribe</option>
+      <option value="Costa Rica">Costa Rica</option>
+      <option value="Panamá">Panamá</option>
+      <option value="Puerto Rico">Puerto Rico</option>
+    </select>
+    <select class="pais-filter" id="clasFilterClas" onchange="renderClasChart()" style="min-width:200px;">
+      <option value="ALL">Todas las clasificaciones</option>
+      <option value="Release o permisos MLOPs">Release o permisos MLOPs</option>
+      <option value="Ingesta Datos - nuevos casos de uso,">Ingesta Datos</option>
+      <option value="Mejora arquitectura">Mejora arquitectura</option>
+      <option value="Cambios pedidos CBM">Cambios pedidos CBM</option>
+      <option value="Integración nuevos canales">Integración nuevos canales</option>
+    </select>
   </div>
-
-  <div class="sl">DETALLE POR CLASIFICACIÓN</div>
-  <div class="tw"><table><thead><tr><th>Clasificación</th><th class="tc">Total</th><th class="tc">Resueltos</th><th class="tc">%Res</th><th class="tc">En Curso</th><th class="tc">Cancelados</th><th class="tc">%Can</th><th class="tc">Med.Hrs</th></tr></thead>
-  <tbody id="clasTable"><tr style="background:#FFF8F5"><td><strong>Soporte a incidencias</strong></td>
-      <td class="tc" style="font-weight:700">676</td>
-      <td class="tc"><span class="badge bgr">477</span></td>
-      <td class="tc">71%</td>
-      <td class="tc"><span class="badge bam">1</span></td>
-      <td class="tc" style="color:var(--dr)">198</td>
-      <td class="tc">29%</td>
-      <td class="tc" style="color:var(--gy)">10h</td></tr><tr><td><strong>Release o permisos MLOPs</strong></td>
-      <td class="tc" style="font-weight:700">73</td>
-      <td class="tc"><span class="badge bgr">68</span></td>
-      <td class="tc">93%</td>
-      <td class="tc">-</td>
-      <td class="tc" style="color:var(--dr)">5</td>
-      <td class="tc">7%</td>
-      <td class="tc" style="color:var(--gy)">3h</td></tr><tr><td><strong>Ingesta Datos - nuevos casos de uso,</strong></td>
-      <td class="tc" style="font-weight:700">31</td>
-      <td class="tc"><span class="badge bgr">26</span></td>
-      <td class="tc">84%</td>
-      <td class="tc"><span class="badge bam">4</span></td>
-      <td class="tc" style="color:var(--dr)">1</td>
-      <td class="tc">3%</td>
-      <td class="tc" style="color:var(--gy)">114h</td></tr><tr><td><strong>Milestones</strong></td>
-      <td class="tc" style="font-weight:700">14</td>
-      <td class="tc"><span class="badge bgr">0</span></td>
-      <td class="tc">0%</td>
-      <td class="tc"><span class="badge bam">1</span></td>
-      <td class="tc" style="color:var(--dr)">0</td>
-      <td class="tc">0%</td>
-      <td class="tc" style="color:var(--gy)">–</td></tr><tr><td><strong>Cambios pedidos CBM</strong></td>
-      <td class="tc" style="font-weight:700">11</td>
-      <td class="tc"><span class="badge bgr">10</span></td>
-      <td class="tc">91%</td>
-      <td class="tc">-</td>
-      <td class="tc" style="color:var(--dr)">1</td>
-      <td class="tc">9%</td>
-      <td class="tc" style="color:var(--gy)">48h</td></tr><tr><td><strong>Mejora arquitectura</strong></td>
-      <td class="tc" style="font-weight:700">7</td>
-      <td class="tc"><span class="badge bgr">5</span></td>
-      <td class="tc">71%</td>
-      <td class="tc"><span class="badge bam">2</span></td>
-      <td class="tc" style="color:var(--dr)">0</td>
-      <td class="tc">0%</td>
-      <td class="tc" style="color:var(--gy)">270h</td></tr><tr><td><strong>Integración nuevos canales</strong></td>
-      <td class="tc" style="font-weight:700">4</td>
-      <td class="tc"><span class="badge bgr">2</span></td>
-      <td class="tc">50%</td>
-      <td class="tc">-</td>
-      <td class="tc" style="color:var(--dr)">1</td>
-      <td class="tc">25%</td>
-      <td class="tc" style="color:var(--gy)">367h</td></tr><tr><td><strong>Solución de issues plataforma</strong></td>
-      <td class="tc" style="font-weight:700">2</td>
-      <td class="tc"><span class="badge bgr">2</span></td>
-      <td class="tc">100%</td>
-      <td class="tc">-</td>
-      <td class="tc" style="color:var(--dr)">0</td>
-      <td class="tc">0%</td>
-      <td class="tc" style="color:var(--gy)">83h</td></tr></tbody></table></div>
+  <div style="position:relative;height:320px;margin-bottom:12px;">
+    <canvas id="cClasHBar"></canvas>
+  </div>
 </div></div>
 
 <!-- TAB 2: POR MERCADO -->
@@ -530,9 +482,11 @@ select.pais-filter{padding:5px 10px;border:1px solid var(--bd);border-radius:5px
         <td class="tc" style="font-size:8px;color:#3A6A15">0</td>
         <td class="tc" style="font-size:8px">-</td></tr></tbody></table>
       <div style="padding:3px 8px;font-size:7.5px;color:var(--gy);border-top:1px solid var(--bd)">Cancel: 1</div></div></div></div>
-  <div class="g2" style="margin-top:12px">
-    <div class="gc"><div class="ct">Recurrentes vs SR por Mercado</div><div class="cs">Distribución por tipo de ticket</div><canvas id="cMktTipo" height="589" style="box-sizing: border-box; display: block; height: 393px; width: 589px;" width="884"></canvas></div>
-    <div class="gc"><div class="ct">Mediana Resolución (hrs)</div><div class="cs">Recurrentes vs SR por país — solo Resueltos</div><canvas id="cMktMed" height="589" style="box-sizing: border-box; display: block; height: 393px; width: 589px;" width="884"></canvas></div>
+  <div id="mkt-peso-section" style="margin-top:12px">
+    <div style="font-size:11px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📊 PESO POR MERCADO Y MEDIANA DE RESOLUCIÓN</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;" id="mktPesoCards">
+      <!-- populated by renderMktPesoCards() -->
+    </div>
   </div>
 </div></div>
 
@@ -1603,6 +1557,7 @@ function updateAllLabels(){
   document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('es',{day:'2-digit',month:'short',year:'numeric'});
   document.getElementById('hdr-src').textContent=DATA_SOURCE.startsWith('file:')?DATA_SOURCE.slice(5):'Datos base embebidos';
   document.getElementById('cls-title').textContent=`RESUMEN GLOBAL ${qL}`;
+  window._CURRENT_DATA = d;
   document.getElementById('mkt-title').textContent=`TICKETS POR MERCADO — ${qL}`;
   document.getElementById('res-title').textContent=`RESUMEN DE ACTIVIDADES ${qL} — períodos bisemanales × mercado`;
   document.getElementById('comp-title').textContent=`COMPARATIVO ${prevL} vs ${qL} — por tipo de incidencia`;
@@ -1616,6 +1571,8 @@ function updateAllLabels(){
   document.getElementById('tab-comp-btn').textContent=`📈 Comparativo ${prevL} vs ${qL}`;
   document.getElementById('tab-rec-btn').textContent=`💡 Recomendaciones ${nextL}`;
   document.getElementById('footer-txt').textContent=`Liberty Latin America · Data Engineering · ${qL} · ${new Date().toLocaleDateString('es')}`;
+  // Render peso cards
+  renderMktPesoCards();
 }
 
 // ══ RENDER ALL TABS ══
@@ -1698,6 +1655,10 @@ function renderClasTab(d,dPrev){
   const clsEnc=clsOrder.map(([,v])=>v.enc);
   const clsTot=clsOrder.map(([,v])=>v.total);
 
+
+  window._CURRENT_DATA = d;
+  window._CURRENT_DATA_PREV = dPrev;
+  renderClasChart();
   mB('cClasHBar',clsLabels,[
     {label:'Resueltos',data:clsRes,backgroundColor:'#7AA95A',borderRadius:3},
     {label:'En Curso',data:clsEnc,backgroundColor:'#FFC000',borderRadius:3}],
@@ -2918,98 +2879,71 @@ function renderTiempoTab() {
       <div class="ks">${k.sub}</div>
     </div>`).join('');
 
-  // ── Chart 1: Desviación por mercado ────────────────────────────────
+  // ── Chart: Delta Tiempo Empleado vs Cierre por Mercado ───────────
   const mkts = Object.keys(td.by_market).filter(m => td.by_market[m].count > 0);
-  if (tiemChartMkt) tiemChartMkt.destroy();
-  const ctx1 = document.getElementById('tiem-chart-mkt').getContext('2d');
-  tiemChartMkt = new Chart(ctx1, {
-    type: 'bar',
-    data: {
-      labels: mkts,
-      datasets: [
-        {
-          label: 'Tiempo Empleado (h)',
-          data: mkts.map(m => td.by_market[m].avg_emp_h),
-          backgroundColor: mkts.map(m => MKT_COLOR[m]+'55'),
-          borderColor: mkts.map(m => MKT_COLOR[m]),
-          borderWidth: 2,
+  const MKT_COLORS = {'Caribe':'#BE1E2E','Costa Rica':'#7AA95A','Panamá':'#466491','Puerto Rico':'#EA5B0C'};
+  const deltaCtx = document.getElementById('tiem-chart-delta');
+  if (deltaCtx) {
+    if (window._tiemChartDelta) window._tiemChartDelta.destroy();
+    window._tiemChartDelta = new Chart(deltaCtx.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: mkts,
+        datasets: [
+          {
+            label: 'Tiempo Empleado (h)',
+            data: mkts.map(m => td.by_market[m].avg_emp_h),
+            backgroundColor: mkts.map(m => (MKT_COLORS[m]||'#888')+'55'),
+            borderColor: mkts.map(m => MKT_COLORS[m]||'#888'),
+            borderWidth: 2,
+            borderRadius: 4,
+          },
+          {
+            label: 'Tiempo de Cierre (h)',
+            data: mkts.map(m => td.by_market[m].avg_cierre_h),
+            backgroundColor: mkts.map(m => (MKT_COLORS[m]||'#888')+'22'),
+            borderColor: mkts.map(m => MKT_COLORS[m]||'#888'),
+            borderWidth: 1,
+            borderDash: [4,4],
+            borderRadius: 4,
+          },
+          {
+            label: 'Delta (h)',
+            data: mkts.map(m => td.by_market[m].avg_diff_h),
+            type: 'line',
+            borderColor: '#BE1E2E',
+            backgroundColor: 'rgba(190,30,46,.08)',
+            pointBackgroundColor: '#BE1E2E',
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            tension: 0.3,
+            fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { font: { size: 10 }, padding: 16 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}h`
+            }
+          }
         },
-        {
-          label: 'Tiempo Cierre (h)',
-          data: mkts.map(m => td.by_market[m].avg_cierre_h),
-          backgroundColor: mkts.map(m => MKT_COLOR[m]+'22'),
-          borderColor: mkts.map(m => MKT_COLOR[m]),
-          borderWidth: 1,
-          borderDash: [4,4],
-        },
-        {
-          label: 'Desviación Prom. (h)',
-          data: mkts.map(m => td.by_market[m].avg_diff_h),
-          type: 'line',
-          borderColor: '#BE1E2E',
-          backgroundColor: 'rgba(190,30,46,.08)',
-          pointBackgroundColor: '#BE1E2E',
-          pointRadius: 5,
-          tension: 0.3,
-          fill: false,
-          yAxisID: 'y',
+        scales: {
+          y: {
+            ticks: { font: { size: 10 }, callback: v => v+'h' },
+            grid: { color: '#f0f0f0' },
+            title: { display: true, text: 'Horas', font: { size: 9 } }
+          },
+          x: { ticks: { font: { size: 10 } } }
         }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { font: { size: 9 } } } },
-      scales: {
-        y: { ticks: { font: { size: 9 } }, grid: { color: '#f0f0f0' } },
-        x: { ticks: { font: { size: 9 } } }
       }
-    }
-  });
+    });
+  }
 
-  // ── Chart 2: Empleado vs Cierre por Tipo ───────────────────────────
-  const tipos = Object.keys(td.by_tipo);
-  if (tiemChartTipo) tiemChartTipo.destroy();
-  const ctx2 = document.getElementById('tiem-chart-tipo').getContext('2d');
-  tiemChartTipo = new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: tipos,
-      datasets: [
-        {
-          label: 'T. Empleado (h)',
-          data: tipos.map(t => td.by_tipo[t].avg_emp_h),
-          backgroundColor: 'rgba(70,100,145,.55)',
-          borderColor: '#466491', borderWidth: 2,
-        },
-        {
-          label: 'T. Cierre (h)',
-          data: tipos.map(t => td.by_tipo[t].avg_cierre_h),
-          backgroundColor: 'rgba(122,169,90,.3)',
-          borderColor: '#7AA95A', borderWidth: 2,
-        },
-        {
-          label: 'Desviación (h)',
-          data: tipos.map(t => td.by_tipo[t].avg_diff_h),
-          type: 'line',
-          borderColor: '#FF4001',
-          pointBackgroundColor: '#FF4001',
-          pointRadius: 4,
-          tension: 0.2,
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { font: { size: 9 } } } },
-      scales: {
-        y: { ticks: { font: { size: 9 } }, grid: { color: '#f0f0f0' } },
-        x: { ticks: { font: { size: 9 } } }
-      }
-    }
-  });
-
-  // ── Tabla resumen por mercado ───────────────────────────────────────
+    // ── Tabla resumen por mercado ───────────────────────────────────────
   const PAISES_ORDER = ['Caribe','Costa Rica','Panamá','Puerto Rico'];
   const mktRows = PAISES_ORDER.map(p => {
     const d = td.by_market[p];
@@ -3059,6 +2993,128 @@ function renderTiempoTab() {
     document.getElementById('tiem-nb').innerHTML =
       '📌 Medición iniciada en Q2 2026 · Los tickets sin "Tiempo empleado" registrado se excluyen del análisis · <span style="color:#BE1E2E;font-weight:700">🚨 '+alerts.length+' ticket(s) abierto(s) con tiempo diligenciado requieren revisión</span>';
   }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// renderClasChart — filtra por país y clasificación, re-renderiza cClasHBar
+// ════════════════════════════════════════════════════════════════════
+function renderClasChart() {
+  const filterPais = (document.getElementById('clasFilterPais') || {}).value || 'ALL';
+  const filterClas = (document.getElementById('clasFilterClas') || {}).value || 'ALL';
+
+  // Get current data
+  const d = window._CURRENT_DATA;
+  if (!d || !d.por_clasificacion) return;
+
+  // Build classification data filtered by país
+  let clsData = {};
+  if (filterPais === 'ALL') {
+    clsData = d.por_clasificacion;
+  } else {
+    // Recompute from raw tickets filtered by country
+    const raw = window._RAW_ROWS || [];
+    raw.filter(r => {
+      const bu = (r['Campo personalizado (Business Unit by OpCo)'] || '').trim();
+      return bu === filterPais;
+    }).forEach(r => {
+      const cls = r['Clasificación'] || r['Summary'] || 'Sin clasificación';
+      const estado = (r['Estado'] || '').toLowerCase();
+      if (!clsData[cls]) clsData[cls] = {total:0, res:0, enc:0, can:0};
+      clsData[cls].total++;
+      if (['resuelta','resuelto','done','listo'].some(s => estado.includes(s))) clsData[cls].res++;
+      else if (['cancelad'].some(s => estado.includes(s))) clsData[cls].can++;
+      else clsData[cls].enc++;
+    });
+  }
+
+  let entries = Object.entries(clsData)
+    .filter(([c]) => !c.toLowerCase().includes('soporte'))
+    .sort((a,b) => b[1].total - a[1].total);
+
+  if (filterClas !== 'ALL') {
+    entries = entries.filter(([c]) => c === filterClas);
+  }
+
+  entries = entries.slice(0, 8);
+
+  const labels = entries.map(([c]) => c.length > 22 ? c.slice(0,22)+'…' : c);
+  const resData = entries.map(([,v]) => v.res || 0);
+  const encData = entries.map(([,v]) => v.enc || 0);
+
+  mB('cClasHBar', labels, [
+    {label:'Resueltos', data:resData, backgroundColor:'#7AA95A', borderRadius:4},
+    {label:'En Curso',  data:encData, backgroundColor:'#FFC000', borderRadius:4}
+  ], '', 'N° Tickets', false, true);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// renderMktPesoCards — tarjetas de peso por mercado con mediana resolución
+// ════════════════════════════════════════════════════════════════════
+function renderMktPesoCards() {
+  const d = window._CURRENT_DATA;
+  if (!d) return;
+  const container = document.getElementById('mktPesoCards');
+  if (!container) return;
+
+  const MKT_COLOR = {
+    'Caribe':     '#BE1E2E',
+    'Costa Rica': '#7AA95A',
+    'Panamá':     '#FFC000',
+    'Puerto Rico':'#466491',
+    'Todos':      '#6F6B6C'
+  };
+  const MKT_TEXT = {
+    'Caribe':     '#fff',
+    'Costa Rica': '#fff',
+    'Panamá':     '#333',
+    'Puerto Rico':'#fff',
+    'Todos':      '#fff'
+  };
+
+  const total = d.total || 1;
+  const mkts = d.por_pais || {};
+  const mktList = ['Caribe','Costa Rica','Panamá','Puerto Rico','Todos'];
+
+  container.innerHTML = mktList.map(pais => {
+    const m = mkts[pais] || {};
+    const cnt = m.total || 0;
+    if (cnt === 0) return '';
+    const pct = Math.round(cnt / total * 100);
+    const res = m.resueltos || 0;
+    const inc = m.inc || 0;
+    const sr  = m.sr  || 0;
+    const medInc = m.med_inc_h != null ? m.med_inc_h + 'h' : '–';
+    const medSR  = m.med_sr_h  != null ? m.med_sr_h  + 'h' : '–';
+    const pctRes = cnt > 0 ? Math.round(res/cnt*100) : 0;
+    const col = MKT_COLOR[pais] || '#888';
+    const txt = MKT_TEXT[pais]  || '#fff';
+    return `<div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+      <div style="background:${col};padding:8px 12px;">
+        <div style="font-size:9px;font-weight:800;color:${txt};letter-spacing:.5px;">${pais === 'Todos' ? '🌐 TODOS' : pais.toUpperCase()}</div>
+        <div style="font-size:22px;font-weight:900;color:${txt};line-height:1.1;">${pct}%</div>
+        <div style="font-size:8.5px;color:${txt};opacity:.85;">${cnt} de ${total} tickets</div>
+      </div>
+      <div style="background:#fff;padding:8px 12px;font-size:9px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+          <span style="color:#555;">Resueltos</span>
+          <span style="font-weight:700;color:#3A6A15;">${pctRes}%</span>
+        </div>
+        <div style="background:#eee;border-radius:3px;height:4px;margin-bottom:6px;">
+          <div style="background:${col};width:${pctRes}%;height:4px;border-radius:3px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:8.5px;color:#666;margin-bottom:2px;">
+          <span>Inc: ${inc}</span><span>SR: ${sr}</span>
+        </div>
+        <div style="border-top:1px solid #eee;margin-top:5px;padding-top:5px;">
+          <div style="font-size:8px;color:#999;margin-bottom:2px;">Mediana resolución</div>
+          <div style="display:flex;justify-content:space-between;font-size:8.5px;">
+            <span>🟠 Inc: <strong>${medInc}</strong></span>
+            <span>🔵 SR: <strong>${medSR}</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── Hook into processExcelData to recalculate tiempo stats ───────────
@@ -3132,39 +3188,16 @@ function hookTiempoOnLoad(rows) {
     <span style="color:#BE1E2E;font-weight:700">Alertas</span> = tickets con estado abierto que ya tienen tiempo diligenciado → deben ser revisados por el equipo solicitante.
   </div>
 
-  <!-- Gráfico desviación por mercado -->
-  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px;align-items:start;">
+  <!-- Gráfico delta tiempo empleado vs cierre -->
+  <div style="margin-bottom:14px;">
     <div class="card" style="padding:14px;">
-      <div style="font-size:10px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📊 Desviación Promedio por Mercado (h)</div>
-      <div style="position:relative;height:200px;"><canvas id="tiem-chart-mkt"></canvas></div>
-    </div>
-    <div class="card" style="padding:14px;">
-      <div style="font-size:10px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📊 Tiempo Empleado vs. Cierre por Tipo</div>
-      <div style="position:relative;height:200px;"><canvas id="tiem-chart-tipo"></canvas></div>
+      <div style="font-size:10px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">📊 Tiempo Empleado vs. Tiempo de Cierre — Delta por Mercado</div>
+      <div style="font-size:9px;color:var(--gy);margin-bottom:10px;"><strong>Tiempo Empleado</strong> = horas reportadas por DE en JIRA · <strong>Tiempo de Cierre</strong> = horas calendario creación→resolución · <strong>Delta</strong> = diferencia (lo que espera el área usuaria más allá del trabajo DE)</div>
+      <div style="position:relative;height:240px;"><canvas id="tiem-chart-delta"></canvas></div>
     </div>
   </div>
 
-  <!-- Tabla resumen por mercado -->
-  <div class="card" style="padding:14px;margin-bottom:14px;">
-    <div style="font-size:10px;font-weight:800;color:var(--dk);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">📋 Resumen por Mercado — Tickets Cerrados con Tiempo Registrado</div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:10px;" id="tiem-mkt-table">
-        <thead>
-          <tr style="background:var(--lk);color:var(--dk);font-weight:700;text-transform:uppercase;font-size:9px;">
-            <th style="padding:6px 10px;text-align:left;">Mercado</th>
-            <th style="padding:6px 10px;text-align:right;">Tickets</th>
-            <th style="padding:6px 10px;text-align:right;">Promedio Tiempo Empleado</th>
-            <th style="padding:6px 10px;text-align:right;">Promedio Tiempo Cierre</th>
-            <th style="padding:6px 10px;text-align:right;">Desviación Promedio</th>
-            <th style="padding:6px 10px;text-align:right;">% con Desviación</th>
-          </tr>
-        </thead>
-        <tbody id="tiem-mkt-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Alertas tickets abiertos -->
+    <!-- Alertas tickets abiertos -->
   <div class="card" style="padding:14px;border:2px solid rgba(190,30,46,.3);">
     <div style="font-size:10px;font-weight:800;color:var(--dr);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">🚨 ALERTAS — Tickets Abiertos con Tiempo Empleado Registrado</div>
     <div style="font-size:9.5px;color:var(--gy);margin-bottom:10px;">Estos tickets tienen tiempo diligenciado pero aún no han sido cerrados · Requieren revisión por parte del equipo CBM solicitante</div>
