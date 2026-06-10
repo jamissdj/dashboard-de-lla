@@ -1457,6 +1457,7 @@ function handleFileUpload(input){
     try{
       const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
       const rows=processExcelData(wb);
+      window._RAW_ROWS=rows;
       hookTiempoOnLoad(rows);
       if(!rows||!rows.length) throw new Error('No se encontraron datos válidos en la hoja Base');
       ALL_DATA={};
@@ -1557,7 +1558,6 @@ function updateAllLabels(){
   document.getElementById('hdr-date').textContent=new Date().toLocaleDateString('es',{day:'2-digit',month:'short',year:'numeric'});
   document.getElementById('hdr-src').textContent=DATA_SOURCE.startsWith('file:')?DATA_SOURCE.slice(5):'Datos base embebidos';
   document.getElementById('cls-title').textContent=`RESUMEN GLOBAL ${qL}`;
-  window._CURRENT_DATA = d;
   document.getElementById('mkt-title').textContent=`TICKETS POR MERCADO — ${qL}`;
   document.getElementById('res-title').textContent=`RESUMEN DE ACTIVIDADES ${qL} — períodos bisemanales × mercado`;
   document.getElementById('comp-title').textContent=`COMPARATIVO ${prevL} vs ${qL} — por tipo de incidencia`;
@@ -1565,11 +1565,10 @@ function updateAllLabels(){
   document.getElementById('comp-inc-title').textContent=`⚡ RECURRENTES (INCIDENTES) — ${prevL} vs ${qL}`;
   document.getElementById('comp-sr-title').textContent=`📋 SERVICE REQUESTS — ${prevL} vs ${qL}`;
   document.getElementById('can-title').textContent=`CANCELADOS — ${qL}`;
-  document.getElementById('rec-title').textContent=`💡 RECOMENDACIONES — basadas en análisis ${qL}, proyectando a ${nextL}`;
-  document.getElementById('rec-nb').innerHTML=`📊 Generadas a partir de los patrones de <strong>${qL}</strong>, proyectando al <strong>${nextL}</strong>.`;
+  { const _el=document.getElementById('rec-title'); if(_el) _el.textContent=`💡 RECOMENDACIONES — basadas en análisis ${qL}, proyectando a ${nextL}`; }
+  { const _el=document.getElementById('rec-nb'); if(_el) _el.innerHTML=`📊 Generadas a partir de los patrones de <strong>${qL}</strong>, proyectando al <strong>${nextL}</strong>.`; }
   document.getElementById('tab-q1c-btn').textContent=`📊 ${qL} — Clasificación`;
   document.getElementById('tab-comp-btn').textContent=`📈 Comparativo ${prevL} vs ${qL}`;
-  document.getElementById('tab-rec-btn').textContent=`💡 Recomendaciones ${nextL}`;
   document.getElementById('footer-txt').textContent=`Liberty Latin America · Data Engineering · ${qL} · ${new Date().toLocaleDateString('es')}`;
   // Render peso cards
   renderMktPesoCards();
@@ -1580,6 +1579,8 @@ function renderAll(){
   const d=ALL_DATA[CURRENT_Q];
   const dPrev=ALL_DATA[Q_PREV[CURRENT_Q]]||null;
   if(!d) return;
+  window._CURRENT_DATA=d;
+  window._CURRENT_DATA_PREV=dPrev;
   renderClasTab(d,dPrev);
   renderMktTab(d);
   renderResumenTab(d);
@@ -3003,7 +3004,7 @@ function renderClasChart() {
   const filterClas = (document.getElementById('clasFilterClas') || {}).value || 'ALL';
 
   // Get current data
-  const d = window._CURRENT_DATA;
+  const d = window._CURRENT_DATA || ALL_DATA[CURRENT_Q];
   if (!d || !d.por_clasificacion) return;
 
   // Build classification data filtered by país
@@ -3051,65 +3052,48 @@ function renderClasChart() {
 // renderMktPesoCards — tarjetas de peso por mercado con mediana resolución
 // ════════════════════════════════════════════════════════════════════
 function renderMktPesoCards() {
-  const d = window._CURRENT_DATA;
+  const d = window._CURRENT_DATA || ALL_DATA[CURRENT_Q];
   if (!d) return;
   const container = document.getElementById('mktPesoCards');
   if (!container) return;
-
-  const MKT_COLOR = {
-    'Caribe':     '#BE1E2E',
-    'Costa Rica': '#7AA95A',
-    'Panamá':     '#FFC000',
-    'Puerto Rico':'#466491',
-    'Todos':      '#6F6B6C'
-  };
-  const MKT_TEXT = {
-    'Caribe':     '#fff',
-    'Costa Rica': '#fff',
-    'Panamá':     '#333',
-    'Puerto Rico':'#fff',
-    'Todos':      '#fff'
-  };
-
+  const MKT_COLOR = {'Caribe':'#BE1E2E','Costa Rica':'#7AA95A','Panamá':'#FFC000','Puerto Rico':'#466491','Todos':'#6F6B6C'};
+  const MKT_TEXT  = {'Caribe':'#fff','Costa Rica':'#fff','Panamá':'#333','Puerto Rico':'#fff','Todos':'#fff'};
   const total = d.total || 1;
-  const mkts = d.por_pais || {};
+  const mktData = d.por_mercado || {};
   const mktList = ['Caribe','Costa Rica','Panamá','Puerto Rico','Todos'];
-
   container.innerHTML = mktList.map(pais => {
-    const m = mkts[pais] || {};
+    const m = mktData[pais] || {};
     const cnt = m.total || 0;
     if (cnt === 0) return '';
     const pct = Math.round(cnt / total * 100);
-    const res = m.resueltos || 0;
-    const inc = m.inc || 0;
-    const sr  = m.sr  || 0;
-    const medInc = m.med_inc_h != null ? m.med_inc_h + 'h' : '–';
-    const medSR  = m.med_sr_h  != null ? m.med_sr_h  + 'h' : '–';
-    const pctRes = cnt > 0 ? Math.round(res/cnt*100) : 0;
+    const res = m.res || 0;
+    const pctRes = cnt > 0 ? Math.round(res / cnt * 100) : 0;
+    const incTotal = (m.inc && m.inc.total) || 0;
+    const srTotal  = (m.sr  && m.sr.total)  || 0;
+    const medInc = (m.inc && m.inc.med != null) ? Math.round(m.inc.med) + 'h' : '–';
+    const medSR  = (m.sr  && m.sr.med  != null) ? Math.round(m.sr.med)  + 'h' : '–';
     const col = MKT_COLOR[pais] || '#888';
     const txt = MKT_TEXT[pais]  || '#fff';
     return `<div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
       <div style="background:${col};padding:8px 12px;">
-        <div style="font-size:9px;font-weight:800;color:${txt};letter-spacing:.5px;">${pais === 'Todos' ? '🌐 TODOS' : pais.toUpperCase()}</div>
+        <div style="font-size:9px;font-weight:800;color:${txt};letter-spacing:.5px;">${pais==='Todos'?'🌐 TODOS':pais.toUpperCase()}</div>
         <div style="font-size:22px;font-weight:900;color:${txt};line-height:1.1;">${pct}%</div>
         <div style="font-size:8.5px;color:${txt};opacity:.85;">${cnt} de ${total} tickets</div>
       </div>
       <div style="background:#fff;padding:8px 12px;font-size:9px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
-          <span style="color:#555;">Resueltos</span>
-          <span style="font-weight:700;color:#3A6A15;">${pctRes}%</span>
+          <span style="color:#555;">Resueltos</span><span style="font-weight:700;color:#3A6A15;">${pctRes}%</span>
         </div>
         <div style="background:#eee;border-radius:3px;height:4px;margin-bottom:6px;">
           <div style="background:${col};width:${pctRes}%;height:4px;border-radius:3px;"></div>
         </div>
-        <div style="display:flex;justify-content:space-between;font-size:8.5px;color:#666;margin-bottom:2px;">
-          <span>Inc: ${inc}</span><span>SR: ${sr}</span>
+        <div style="display:flex;justify-content:space-between;font-size:8.5px;color:#666;margin-bottom:4px;">
+          <span>🟠 Inc: ${incTotal}</span><span>🔵 SR: ${srTotal}</span>
         </div>
-        <div style="border-top:1px solid #eee;margin-top:5px;padding-top:5px;">
+        <div style="border-top:1px solid #eee;padding-top:5px;">
           <div style="font-size:8px;color:#999;margin-bottom:2px;">Mediana resolución</div>
           <div style="display:flex;justify-content:space-between;font-size:8.5px;">
-            <span>🟠 Inc: <strong>${medInc}</strong></span>
-            <span>🔵 SR: <strong>${medSR}</strong></span>
+            <span>🟠 <strong>${medInc}</strong></span><span>🔵 <strong>${medSR}</strong></span>
           </div>
         </div>
       </div>
@@ -3753,6 +3737,7 @@ function handleFileUpload(input){
     try{
       const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellDates:true});
       const rows=processExcelData(wb);
+      window._RAW_ROWS=rows;
       hookTiempoOnLoad(rows);
       if(!rows||!rows.length) throw new Error('No se encontraron datos válidos en la hoja Base');
       ALL_DATA={};
@@ -3864,7 +3849,6 @@ function updateAllLabels(){
   document.getElementById('rec-nb').innerHTML=`📊 Generadas a partir de los patrones de <strong>${qL}</strong>, proyectando al <strong>${nextL}</strong>.`;
   document.getElementById('tab-q1c-btn').textContent=`📊 ${qL} — Clasificación`;
   document.getElementById('tab-comp-btn').textContent=`📈 Comparativo ${prevL} vs ${qL}`;
-  document.getElementById('tab-rec-btn').textContent=`💡 Recomendaciones ${nextL}`;
   document.getElementById('footer-txt').textContent=`Liberty Latin America · Data Engineering · ${qL} · ${new Date().toLocaleDateString('es')}`;
 }
 
