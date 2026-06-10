@@ -3033,16 +3033,20 @@ function renderClasChart() {
   } else {
     // Recompute from raw tickets filtered by country
     const raw = window._RAW_ROWS || [];
+    // Filter by current Q first, then by country
+    const qBounds = Q_BOUNDS[CURRENT_Q];
     raw.filter(r => {
-      const bu = (r['Campo personalizado (Business Unit by OpCo)'] || '').trim();
-      return bu === filterPais;
+      if (!r.Creada || !qBounds) return false;
+      const inQ = r.Creada >= qBounds.start && r.Creada <= qBounds.end;
+      return inQ && r.Pais === filterPais;
     }).forEach(r => {
-      const cls = r['Clasificación'] || r['Summary'] || 'Sin clasificación';
-      const estado = (r['Estado'] || '').toLowerCase();
+      const cls = r['Clasificación'] || 'Sin clasificación';
+      if (cls.toLowerCase().includes('soporte')) return; // exclude soporte
       if (!clsData[cls]) clsData[cls] = {total:0, res:0, enc:0, can:0};
       clsData[cls].total++;
-      if (['resuelta','resuelto','done','listo'].some(s => estado.includes(s))) clsData[cls].res++;
-      else if (['cancelad'].some(s => estado.includes(s))) clsData[cls].can++;
+      const estado = (r.Estado || '').toLowerCase();
+      if (['resuelta','resuelto','done','listo','cerrada','cerrado'].some(s => estado.includes(s))) clsData[cls].res++;
+      else if (estado.includes('cancel')) clsData[cls].can++;
       else clsData[cls].enc++;
     });
   }
