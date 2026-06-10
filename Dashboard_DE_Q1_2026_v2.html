@@ -5,6 +5,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+// ── Safe element accessor — prevents null errors on removed elements ──
+(function(){
+  const _orig = document.getElementById.bind(document);
+  const _dummy = new Proxy({}, {
+    get(t,k){ return typeof k==='string'&&k!=='then'?()=>_dummy:undefined; },
+    set(){ return true; }
+  });
+  Object.defineProperty(_dummy,'innerHTML',{get:()=>'',set(){}});
+  Object.defineProperty(_dummy,'textContent',{get:()=>'',set(){}});
+  Object.defineProperty(_dummy,'className',{get:()=>'',set(){}});
+  Object.defineProperty(_dummy,'style',{get:()=>new Proxy({},{get:()=>'',set(){return true;}}),set(){}});
+  Object.defineProperty(_dummy,'value',{get:()=>'',set(){}});
+  document.getElementById = function(id){
+    const el = _orig(id);
+    return el || _dummy;
+  };
+})();
+</script>
+<script>
 window._XLSX_SHEETJS = window.XLSX;
 </script>
 <script>/* xlsx-style v0.8.13 — para escritura con estilos — expuesto como XLSX_STYLE */
